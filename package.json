@@ -22,9 +22,14 @@
     "android": "cd example && npm run android",
     "ios": "cd example && npm run ios"
   },
+  "dependencies": {
+    "xdate": "^0.8.0",
+    "lodash": "^4.0.0",
+    "prop-types": "^15.5.10"
+  },
   "peerDependencies": {
     "react": "^16.9.0",
-    "react-native": "^0.41.2"
+    "react-native": "^0.60.4"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
@@ -51,13 +56,12 @@
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-standard": "^4.0.1",
     "prettier-eslint": "^9.0.0",
-    "react": "16.8.6",
+    "react": "16.9.0",
     "react-native": "0.60.4",
-    "typescript": "^3.4.3"
-  },
-  "dependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/runtime": "^7.6.0",
-    "react-native-calendars": "^1.212.0"
+    "typescript": "^3.4.3",
+    "jasmine": "^2.5.2",
+    "semver": "5.x.x",
+    "shell-utils": "1.x.x",
+    "react-native-navigation": "2.13.1"
   }
 }

@@ -1,23 +1,15 @@
 import React, { Component } from 'react'
 import { Text, View, ViewStyle } from 'react-native'
-import { Calendar } from 'react-native-calendars'
+import { Calendar } from './react-native-calendars'
 import XDate from 'xdate'
 import { Circle } from './Circle'
-// import TimeHelper from '../../helpers/TimeHelper'
-// import strings from '../../localization'
-// import Circle from '../common/Circle'
 import { ClickableView } from './ClickableView'
 import { DayKey } from './DayKey'
-import { Slot } from './Slot'
+import { Slot, SlotMap } from './Slot'
 import { StateView } from './StateView'
-// import { CommonStyles } from '../common/CommonStyles'
-// import { cancelIcon, iconCalendar, iconClock } from '../common/IconsSet'
-// import StateView from '../common/StateView'
-// import colors from '../common/styles/colors'
-// import textStyles from '../common/styles/textStyles'
 import { TimeCalendar } from './TimeCalendar'
 export interface ScheduleViewProps {
-  slots: Map<DayKey, Slot[]>
+  slots: SlotMap
 
   style?: ViewStyle
   isLoading?: boolean
@@ -44,6 +36,15 @@ export interface ScheduleViewState {
   showCancel: boolean
   currentDateHack: Date // used for navigate by calendar months
 }
+
+type Marked = {
+  today: boolean
+  selected: boolean
+  marked: boolean
+  enabled: boolean
+  manual: boolean
+}
+type MarkedSlot = Slot | Marked
 
 export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState> {
   static defaultProps = {
@@ -79,7 +80,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
     prevProps: Readonly<ScheduleViewProps>,
     prevState: Readonly<ScheduleViewState>
   ) {
-    const { slots, onDateChanges } = this.props
+    const { onDateChanges } = this.props
     const { selectedDate, selectedSlot } = this.state
 
     const isDateChanges = prevState.selectedDate !== selectedDate
@@ -126,29 +127,35 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
   renderBottomView() {
     const { showCalendar, showTime, selectedDate, selectedSlot, currentDateHack } = this.state
     const { slots, isLoading, onMonthChanges } = this.props
-    const markedDates = { ...slots }
+    const markedDates: { [day: string]: MarkedSlot[] } = { ...slots }
     if (showCalendar) {
       const today = new Date().toISOString().slice(0, 10) // yyyy-mm-dd
       Object.keys(slots).forEach(key => {
-        const timeSlots = markedDates.get(key) || []
+        // const timeSlots: Slot[] = markedDates[key] || []
         // const firstTimeSlot = timeSlots[0] || {}
         // const isHasDoctors = firstTimeSlot.availableDoctorsCount > 0 // todo: move it into props function
         // const isHasDoctors = !!_.find(timeSlots, element => element.availableDoctorsCount > 0) // todo: move it into props function
-        const isHasDoctors = true // todo: move it into props function
-        markedDates.set(key, {
-          // ...original,
-          today: key === today,
-          selected: key === selectedDate,
-          marked: true,
-          enabled: isHasDoctors,
-          manual: true,
-          // disableTouchEvent: !isHasDoctors,
-        })
+        // const isHasDoctors = true // todo: move it into props function
+        // markedDates[key] = {
+        //   // ...original,
+        //   today: key === today,
+        //   selected: key === selectedDate,
+        //   marked: true,
+        //   enabled: isHasDoctors,
+        //   manual: true,
+        //   // disableTouchEvent: !isHasDoctors,
+        // }
       })
 
       return (
         <Calendar
-          // customStyles={undefined}
+          displayLoadingIndicator={isLoading}
+          // markingType="custom"
+          markedDates={{
+            '2019-09-12': { marked: true },
+            '2019-09-13': { marked: true, dotColor: 'red', activeOpacity: 0 },
+            '2019-09-14': { disabled: true, disableTouchEvent: true },
+          }}
           onMonthChange={date => {
             onMonthChanges && onMonthChanges(date.year, date.month)
           }}
@@ -217,9 +224,6 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
               </ClickableView>
             )
           }}
-          displayLoadingIndicator={isLoading}
-          markingType="custom"
-          markedDates={markedDates}
         />
       )
     }

@@ -1,13 +1,8 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { Text, View, ViewStyle, TouchableOpacity } from 'react-native'
-import { Slot } from './Slot'
+import { Slot, SlotMap } from './Slot'
 import { DayKey } from './DayKey'
-// import { chunk } from '../../helpers/Utils'
-// import strings from '../../localization'
-// import ClickableView from '../common/ClickableView'
-// import { colors } from '../common/CommonStyles'
-// import { iconChevronLeft, iconChevronRight } from '../common/IconsSet'
 
 /**
  * Split array into chunks by predifined length
@@ -25,7 +20,7 @@ export function chunk<T>(array: T[], length: number): T[][] {
 }
 
 export interface TimeCalendarProps {
-  slots: Map<DayKey, Slot[]>
+  slots: SlotMap
 
   renderSlot: (
     props: {
@@ -138,21 +133,17 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     })
   }
 
-  selectDefaultDay(slots: Map<DayKey, Slot[]>): DayKey {
-    return slots.keys().next().value
+  selectDefaultDay(slots: SlotMap): DayKey {
+    return Object.keys(slots)[0]
   }
 
-  renderHeader(
-    slots: Map<DayKey, Slot[]>,
-    showDate: DayKey,
-    dateFormatter: (date: DayKey) => string
-  ) {
+  renderHeader(slots: SlotMap, showDate: DayKey, dateFormatter: (date: DayKey) => string) {
     // const groupedByDays = groupBy(slots, item => item.dateString)
     // const formattedDays = Array.from(groupedByDays.keys())
     // const indexOfDay = indexOf(formattedDays, element => {
     //   return element === TimeHelper.format(date, TimeHelper.PATTERN_YEAR_MONTH_DAY)
     // })
-    const days = Array.from(slots.keys())
+    const days = Object.keys(slots.keys)
     const indexOfDay = days.findIndex(day => day === showDate)
 
     const hasPrevDay = indexOfDay !== 0
@@ -232,7 +223,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
 
     // const groupedByDays = groupBy(slots, time => time.dateString)
     // const formatedShowDay = TimeHelper.format(showDate.date, TimeHelper.PATTERN_YEAR_MONTH_DAY)
-    const daySlots: Slot[] = slots.get(showDate)!!
+    const daySlots: Slot[] = slots[showDate]!!
     const rows = chunk(daySlots, columns)
 
     return (
