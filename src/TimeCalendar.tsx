@@ -4,6 +4,7 @@ import { Text, View, ViewStyle, TouchableOpacity } from 'react-native'
 import { Slot, SlotMap } from './Slot'
 import { DayKey } from './DayKey'
 import { StateView } from './StateView'
+import XDate from 'xdate'
 
 /**
  * Split array into chunks by predifined length
@@ -57,6 +58,7 @@ export interface TimeCalendarProps {
 
   timeFormatter: (time: Date) => string
   dateFormatter: (date: DayKey) => string
+  formatHeaderDay?: (day: DayKey) => string
 }
 
 export interface TimeCalendarState {
@@ -76,7 +78,10 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
       return <Text>{props.timeFormatter(slot.time)}</Text>
     },
     timeFormatter: (time: any) => time,
-    dateFormatter: (time: Date) => time,
+    formatHeaderDay: (dayKey: DayKey) => {
+      const xdate = new Date(dayKey)
+      return xdate.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
+    },
     // onSelectedNewDate: null,
     onSlotSelected: (dayKey: DayKey, slot: Slot) => {
       console.warn('not implemented onSelectedSlot: ' + JSON.stringify(slot))
@@ -147,18 +152,14 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     return Object.keys(slots)[0]
   }
 
-  renderHeader(slots: SlotMap, showDate: DayKey, dateFormatter: (date: DayKey) => string) {
-    // const groupedByDays = groupBy(slots, item => item.dateString)
-    // const formattedDays = Array.from(groupedByDays.keys())
-    // const indexOfDay = indexOf(formattedDays, element => {
-    //   return element === TimeHelper.format(date, TimeHelper.PATTERN_YEAR_MONTH_DAY)
-    // })
+  renderHeader(slots: SlotMap) {
+    const { renderArrow, formatHeaderDay } = this.props
+    const { showDate } = this.state
     const days = Object.keys(slots)
     const indexOfDay = days.findIndex(day => day === showDate)
 
     const hasPrevDay = indexOfDay !== 0
     const hasNextDay = indexOfDay !== days.length - 1
-    const { renderArrow } = this.props
     return (
       <View
         style={{
@@ -180,7 +181,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
             onPress={() => {
               this.onClickPrevDay(indexOfDay, days)
             }}>
-            {renderArrow('left')}
+            {renderArrow && renderArrow('left')}
           </TouchableOpacity>
         )}
 
@@ -195,7 +196,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
             right: 0,
             zIndex: 0,
           }}>
-          {dateFormatter(showDate)}
+          {formatHeaderDay && showDate && formatHeaderDay(showDate!)}
         </Text>
 
         {hasNextDay && (
@@ -208,7 +209,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
             onPress={() => {
               this.onClickNextDay(indexOfDay, days)
             }}>
-            {renderArrow('right')}
+            {renderArrow && renderArrow('right')}
           </TouchableOpacity>
         )}
       </View>
@@ -231,7 +232,6 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     const {
       slots,
       columns,
-      dateFormatter,
       timeFormatter,
       onSlotSelected,
       style,
@@ -240,14 +240,12 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     } = this.props
     if (!slots) return this.renderEmpty()
 
-    // const groupedByDays = groupBy(slots, time => time.dateString)
-    // const formatedShowDay = TimeHelper.format(showDate.date, TimeHelper.PATTERN_YEAR_MONTH_DAY)
-    const daySlots: Slot[] = slots[showDate]!!
+    const daySlots: Slot[] = slots[showDate!]!!
     const rows = chunk(daySlots, columns)
 
     return (
       <View style={[{ paddingBottom: 4 }, style]}>
-        {this.renderHeader(slots, showDate, dateFormatter)}
+        {this.renderHeader(slots)}
         {rows.map((column, indexColumn) => (
           <View
             key={column.map(slot => keyExtractor(slot)).join(';')}

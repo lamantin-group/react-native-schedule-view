@@ -33,6 +33,11 @@ export interface ScheduleViewProps {
    */
   formatDate?: (date: DayKey) => string
 
+  /**
+   * Format day showed in TimeCalendar header
+   */
+  formatHeaderDay?: (date: DayKey) => string
+
   formatTime?: (slot: Slot) => string
 
   strings?: {
@@ -82,6 +87,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
     onDateChanges: (date: Date, slot?: Slot) => {},
     formatDate: (date: DayKey) => date,
     formatTime: (slot: Slot) => slot.time.toLocaleTimeString(),
+    formatHeaderDay: undefined,
     isLoading: false,
     onMonthChanges: (year: number, month: number) => {},
 
@@ -204,8 +210,8 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
     })
   }
 
-  renderBottomView() {
-    const { showTime, showDate } = this.props
+  renderCalendar() {
+    const { showTime, showDate, formatHeaderDay } = this.props
     const { selectedDate, selectedSlot, currentDateHack } = this.state
     const {
       slots,
@@ -308,6 +314,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
               selectedSlot: slot,
             })
           }}
+          formatHeaderDay={formatHeaderDay}
           renderArrow={renderArrow}
           renderSlot={(props, slot) => {
             const selected = slot.time === (selectedSlot || {}).time
@@ -348,6 +355,6 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
   render() {
     const { style } = this.props
 
-    return <View style={style}>{this.renderBottomView()}</View>
+    return <View style={style}>{this.renderCalendar()}</View>
   }
 }
