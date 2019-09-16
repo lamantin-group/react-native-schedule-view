@@ -1,5 +1,5 @@
 import React, { Component, ReactNode } from 'react'
-import { Animated, TouchableOpacity, ViewStyle } from 'react-native'
+import { Animated, TouchableOpacity, ViewStyle, View } from 'react-native'
 
 interface StateViewProps extends Readonly<{ children?: ReactNode }> {
   /**
@@ -15,6 +15,8 @@ interface StateViewProps extends Readonly<{ children?: ReactNode }> {
   disabledOpacity?: number
 
   style?: ViewStyle
+
+  duration: number
 }
 
 /**
@@ -28,6 +30,7 @@ export class StateView extends Component<StateViewProps> {
     enabled: true,
     disabledOpacity: 0.3,
     style: {},
+    duration: 300,
   }
 
   state = {
@@ -35,7 +38,7 @@ export class StateView extends Component<StateViewProps> {
   }
 
   componentDidUpdate(prevProps: StateViewProps, prevState: StateViewProps) {
-    const { enabled, disabledOpacity } = this.props
+    const { enabled, disabledOpacity, duration } = this.props
     const { animatedOpacity } = this.state
     const hasChanges = enabled !== prevProps.enabled
 
@@ -44,7 +47,7 @@ export class StateView extends Component<StateViewProps> {
 
       Animated.timing(animatedOpacity, {
         toValue: toEnabled ? 1 : disabledOpacity!!,
-        duration: 300,
+        duration: duration,
       }).start()
     }
   }

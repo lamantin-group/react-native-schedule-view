@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { Text, View, ViewStyle, TouchableOpacity } from 'react-native'
 import { Slot, SlotMap } from './Slot'
 import { DayKey } from './DayKey'
+import { StateView } from './StateView'
 
 /**
  * Split array into chunks by predifined length
@@ -22,6 +23,7 @@ export function chunk<T>(array: T[], length: number): T[][] {
 export interface TimeCalendarProps {
   slots: SlotMap
 
+  renderArrow: (direction: 'left' | 'right') => React.ReactNode
   renderSlot: (
     props: {
       onPress: () => void
@@ -155,11 +157,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
 
     const hasPrevDay = indexOfDay !== 0
     const hasNextDay = indexOfDay !== days.length - 1
-
-    const styleIcon = {
-      size: 16,
-      color: 'blue', // todo: move into props
-    }
+    const { renderArrow } = this.props
     return (
       <View
         style={{
@@ -172,11 +170,15 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
         }}>
         {hasPrevDay && (
           <TouchableOpacity
+            style={{
+              position: 'absolute',
+              zIndex: 1,
+              left: 16,
+            }}
             onPress={() => {
               this.onClickPrevDay(indexOfDay, days)
             }}>
-            {/* // todo: move into props */}
-            {/* {iconChevronLeft(styleIcon)} */}
+            {renderArrow('left')}
           </TouchableOpacity>
         )}
 
@@ -186,17 +188,25 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
             flexGrow: 1,
             fontSize: 16,
             fontWeight: '100',
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            zIndex: 0,
           }}>
           {dateFormatter(showDate)}
         </Text>
 
         {hasNextDay && (
           <TouchableOpacity
+            style={{
+              position: 'absolute',
+              end: 16,
+              zIndex: 1,
+            }}
             onPress={() => {
               this.onClickNextDay(indexOfDay, days)
             }}>
-            {/* // todo: move into props */}
-            {/* {iconChevronRight(styleIcon)} */}
+            {renderArrow('right')}
           </TouchableOpacity>
         )}
       </View>

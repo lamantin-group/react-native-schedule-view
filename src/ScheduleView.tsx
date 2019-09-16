@@ -317,6 +317,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
               selectedSlot: slot,
             })
           }}
+          renderArrow={renderArrow}
           renderSlot={(props, slot) => {
             const selected = slot.time === (selectedSlot || {}).time
             const disabled = !slot.enabled
