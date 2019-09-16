@@ -330,7 +330,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
                     ...textStyle,
                     paddingVertical: 5,
                   }}>
-                  {slot.time}
+                  {slot.time.toLocaleTimeString()}
                 </Text>
               </StateView>
             )
