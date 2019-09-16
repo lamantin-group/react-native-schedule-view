@@ -18,6 +18,7 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen'
+import { SwitchView } from 'react-native-lamantin'
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -59,8 +60,8 @@ const styles = StyleSheet.create({
 })
 
 import { ScheduleView, DayKey, Slot } from 'react-native-library'
-import { SlotMap } from '../src/Slot'
 import { ScheduleHeader } from '../src/ScheduleHeader'
+import { SlotMap } from '../src/Types'
 
 function getDate(xDate: XDate): string {
   return xDate.toISOString().slice(0, 10)
@@ -71,21 +72,17 @@ interface AppState {
   slot?: Slot | null
   showTime: boolean
   showDate: boolean
+  slots: SlotMap
 }
 
 export default class App extends Component<{}, AppState> {
-  state = {
-    showTime: true,
-    showDate: false,
-  }
-
-  render() {
+  constructor(props: any) {
+    super(props)
     const yesterday = new XDate().addDays(-1)
     const today = new XDate()
     const tomorrow = new XDate().addDays(1)
 
     const slots: SlotMap = {}
-    // 2019-12-31 -> YYYY-MM-DD
     slots[getDate(yesterday)] = [
       {
         time: yesterday.toDate(),
@@ -126,17 +123,44 @@ export default class App extends Component<{}, AppState> {
         enabled: true,
       },
     ]
+    this.state = {
+      slots,
+      showTime: true,
+      showDate: false,
+    }
+  }
 
-    const { date, slot, showDate, showTime } = this.state
+  render() {
+    const { date, slot, showDate, showTime, slots } = this.state
 
     return (
       <Fragment>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView>
-          <ScrollView contentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
+          <ScrollView
+            style={{
+              paddingHorizontal: 16,
+              paddingVertical: 16,
+            }}>
+            <Text style={{ fontSize: 24, marginBottom: 16 }}>Settings</Text>
+
+            <SwitchView
+              checked={showDate}
+              title="Show date"
+              style={{ marginBottom: 16 }}
+              onChanges={checked => this.setState({ showDate: checked })}
+            />
+
+            <SwitchView
+              style={{ marginBottom: 16 }}
+              checked={showTime}
+              title="Show time"
+              onChanges={checked => this.setState({ showTime: checked })}
+            />
+
             <ScheduleHeader
-              date={date ? date.toString() : 'Undefined date'}
-              time={slot ? slot.time.toTimeString() : 'Undefined time'}
+              date={date ? date.toString() : 'Select date'}
+              time={slot ? `${slot.time.getHours()}:${slot.time.getMinutes()}` : 'Select time'}
               onPressTime={() =>
                 this.setState({
                   showDate: false,
@@ -150,18 +174,22 @@ export default class App extends Component<{}, AppState> {
                 })
               }
             />
+            <View style={{ height: 1 }} />
             <ScheduleView
               slots={slots}
               showDate={showDate}
               showTime={showTime}
               formatTime={(slot: Slot) => `${slot.time.getHours()}:${slot.time.getMinutes()}`}
-              onDateChanges={(date: DayKey | null, slot: Slot | null) => {
+              onDateChanges={(date?: DayKey, slot?: Slot) => {
                 this.setState({
                   date: date,
                   slot: slot,
                 })
               }}
             />
+
+            <Text style={{ fontSize: 18, marginTop: 24 }}>Slots</Text>
+            <Text>{JSON.stringify(slots, null, '\t')}</Text>
           </ScrollView>
         </SafeAreaView>
       </Fragment>

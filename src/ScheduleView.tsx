@@ -207,11 +207,6 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
     if (showDate) {
       const today = new Date().toISOString().slice(0, 10) // yyyy-mm-dd
       Object.keys(slots).forEach(key => {
-        // const timeSlots: Slot[] = markedDates[key] || []
-        // const firstTimeSlot = timeSlots[0] || {}
-        // const isHasDoctors = firstTimeSlot.availableDoctorsCount > 0 // todo: move it into props function
-        // const isHasDoctors = !!_.find(timeSlots, element => element.availableDoctorsCount > 0) // todo: move it into props function
-        // const isHasDoctors = true // todo: move it into props function
         markedDates[key] = {
           today: key === today,
           selected: key === selectedDate,

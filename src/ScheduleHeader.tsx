@@ -29,6 +29,9 @@ export class ScheduleHeader extends Component<ScheduleHeaderProps> {
           flexDirection: 'row',
           alignContent: 'center',
           alignItems: 'center',
+          backgroundColor: 'white',
+          paddingHorizontal: 16,
+          paddingVertical: 4,
         }}>
         <ClickableView style={{ flexDirection: 'row', flexGrow: 1 }} onPress={onPressDate}>
           <View style={{ marginStart: 8 }}>

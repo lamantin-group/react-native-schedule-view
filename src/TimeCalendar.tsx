@@ -1,6 +1,11 @@
 import React, { Component } from 'react'
-import { Text, TouchableOpacity, View, ViewStyle } from 'react-native'
+import { Text, TouchableOpacity, View, ViewStyle, NativeModules, Platform } from 'react-native'
 import { Slot, SlotMap, DayKey, StringsTimeCalendar } from './Types'
+
+const deviceLanguage = (Platform.OS === 'ios'
+  ? NativeModules.SettingsManager.settings.AppleLocale
+  : NativeModules.I18nManager.localeIdentifier
+).replace('_', '-')
 
 /**
  * Split array into chunks by predifined length
@@ -73,7 +78,11 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     timeFormatter: (time: any) => time,
     formatHeaderDay: (dayKey: DayKey) => {
       const xdate = new Date(dayKey)
-      return xdate.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
+      return xdate.toLocaleDateString(deviceLanguage, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      })
     },
     // onSelectedNewDate: null,
     onSlotSelected: (dayKey: DayKey, slot: Slot) => {
