@@ -75,7 +75,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
     },
     onDateChanges: (date: Date, slot?: Slot) => {},
     formatterSelectedDay: (date: Date) => date,
-    formatterSelectedTime: (slot: Slot) => slot.time,
+    formatterSelectedTime: (slot: Slot) => slot.time.toLocaleTimeString(),
     isLoading: false,
     onMonthChanges: (year: number, month: number) => {},
 
