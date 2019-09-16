@@ -12,6 +12,9 @@ import { DateObject } from 'react-native-calendars'
 export interface ScheduleViewProps {
   slots: SlotMap
 
+  showTime: boolean
+  showDate: boolean
+
   style?: ViewStyle
   isLoading?: boolean
   today?: Date
@@ -25,7 +28,11 @@ export interface ScheduleViewProps {
   onDateChanges?: (date: DayKey | null, slot: Slot | null) => void
   onMonthChanges?: (year: number, month: number) => void
 
-  formatterSelectedDay?: (date: DayKey) => string
+  /**
+   * Format selected date
+   */
+  formatDate?: (date: DayKey) => string
+
   formatTime?: (slot: Slot) => string
 
   strings?: {
@@ -37,11 +44,8 @@ export interface ScheduleViewProps {
 }
 
 export interface ScheduleViewState {
-  showCalendar: boolean
-  showTime: boolean
   selectedDate: DayKey | null // key for map of slots
   selectedSlot: Slot | null
-  showCancel: boolean
   currentDateHack: Date // used for navigate by calendar months
 }
 
@@ -62,7 +66,7 @@ export type DayProps = {
 }
 
 export type SlotProps = {
-  formatter: (slot: Slot) => string
+  formatter?: (slot: Slot) => string
   selected: boolean
   enabled: boolean
   slot: Slot
@@ -76,7 +80,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       return {}
     },
     onDateChanges: (date: Date, slot?: Slot) => {},
-    formatterSelectedDay: (date: Date) => date,
+    formatDate: (date: DayKey) => date,
     formatTime: (slot: Slot) => slot.time.toLocaleTimeString(),
     isLoading: false,
     onMonthChanges: (year: number, month: number) => {},
@@ -159,11 +163,8 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
   constructor(props: ScheduleViewProps) {
     super(props)
     this.state = {
-      showCalendar: false,
-      showTime: true, // todo: fix to false
       selectedDate: null,
       selectedSlot: null,
-      showCancel: false,
       currentDateHack: new Date(),
     }
   }
@@ -185,25 +186,11 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       // ? need close schedule after select slot
       // if (isSlotChanges) {
       //   payload.showTime = false
-      //   payload.showCalendar = false
+      //   payload.showDate = false
       // }
       this.setState(payload)
       onDateChanges && onDateChanges(selectedDate, selectedSlot)
     }
-  }
-
-  onClickShowCalendar = () => {
-    this.setState(prevState => ({
-      showCalendar: !prevState.showCalendar,
-      showTime: false,
-    }))
-  }
-
-  onClickShowTime = () => {
-    this.setState(prevState => ({
-      showCalendar: false,
-      showTime: !prevState.showTime,
-    }))
   }
 
   onPressClear = () => {
@@ -218,7 +205,8 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
   }
 
   renderBottomView() {
-    const { showCalendar, showTime, selectedDate, selectedSlot, currentDateHack } = this.state
+    const { showTime, showDate } = this.props
+    const { selectedDate, selectedSlot, currentDateHack } = this.state
     const {
       slots,
       isLoading,
@@ -230,7 +218,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       formatTime,
     } = this.props
     const markedDates: { [day: string]: MarkedDay } = { ...slots }
-    if (showCalendar) {
+    if (showDate) {
       const today = new Date().toISOString().slice(0, 10) // yyyy-mm-dd
       Object.keys(slots).forEach(key => {
         // const timeSlots: Slot[] = markedDates[key] || []
@@ -358,55 +346,8 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
   }
 
   render() {
-    const { style, strings, formatterSelectedDay, formatTime } = this.props
-    const { selectedDate, selectedSlot, showCancel } = this.state
+    const { style } = this.props
 
-    const titleDate = selectedDate ? formatterSelectedDay!(selectedDate) : strings!.select_date
-    const titleTime = selectedSlot ? formatTime!(selectedSlot) : strings!.select_time
-
-    return (
-      <View
-        style={{
-          ...style,
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignContent: 'center',
-            alignItems: 'center',
-          }}>
-          <ClickableView
-            style={{ flexDirection: 'row', flexGrow: 1 }}
-            onPress={this.onClickShowCalendar}>
-            {/* {iconCalendar()} */}
-            <View style={{ marginStart: 8 }}>
-              <Text>{strings!.date}</Text>
-              <Text>{titleDate}</Text>
-            </View>
-          </ClickableView>
-
-          <ClickableView
-            style={{ flexDirection: 'row', flexGrow: 1 }}
-            onPress={this.onClickShowTime}>
-            {/* {iconClock()}  todo */}
-            <View style={{ marginStart: 8 }}>
-              <Text>{strings!.time}</Text>
-              <Text>{titleTime}</Text>
-            </View>
-          </ClickableView>
-
-          {showCancel && (
-            <ClickableView onPress={this.onPressClear}>
-              {/* {cancelIcon({
-                size: 24,
-              })} */}
-              {/* // todo */}
-            </ClickableView>
-          )}
-        </View>
-
-        {this.renderBottomView()}
-      </View>
-    )
+    return <View style={style}>{this.renderBottomView()}</View>
   }
 }

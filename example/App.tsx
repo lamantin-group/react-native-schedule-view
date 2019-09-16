@@ -8,7 +8,7 @@
  * @format
  */
 
-import React, { Fragment } from 'react'
+import React, { Fragment, Component } from 'react'
 import { SafeAreaView, StyleSheet, ScrollView, View, Text, StatusBar } from 'react-native'
 import XDate from 'xdate'
 import {
@@ -60,72 +60,112 @@ const styles = StyleSheet.create({
 
 import { ScheduleView, DayKey, Slot } from 'react-native-library'
 import { SlotMap } from '../src/Slot'
+import { ScheduleHeader } from '../src/ScheduleHeader'
 
 function getDate(xDate: XDate): string {
   return xDate.toISOString().slice(0, 10)
 }
 
-const App = () => {
-  const yesterday = new XDate().addDays(-1)
-  const today = new XDate()
-  const tomorrow = new XDate().addDays(1)
-
-  const slots: SlotMap = {}
-  // 2019-12-31 -> YYYY-MM-DD
-  slots[getDate(yesterday)] = [
-    {
-      time: yesterday.toDate(),
-      enabled: true,
-    },
-    {
-      time: new XDate(yesterday).addHours(1).toDate(),
-      enabled: false,
-    },
-  ]
-
-  slots[getDate(today)] = [
-    {
-      time: new XDate(today).addHours(-1).toDate(),
-      enabled: true,
-    },
-    {
-      time: today.toDate(),
-      enabled: true,
-    },
-    {
-      time: new XDate(today).addHours(1).toDate(),
-      enabled: false,
-    },
-  ]
-
-  slots[getDate(tomorrow)] = [
-    {
-      time: new XDate(tomorrow).addHours(-1).toDate(),
-      enabled: true,
-    },
-    {
-      time: tomorrow.toDate(),
-      enabled: true,
-    },
-    {
-      time: new XDate(tomorrow).addHours(1).toDate(),
-      enabled: true,
-    },
-  ]
-
-  return (
-    <Fragment>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView contentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
-          <ScheduleView
-            slots={slots}
-            formatTime={(slot: Slot) => `${slot.time.getHours()}:${slot.time.getMinutes()}`}
-          />
-        </ScrollView>
-      </SafeAreaView>
-    </Fragment>
-  )
+interface AppState {
+  date?: DayKey | null
+  slot?: Slot | null
+  showTime: boolean
+  showDate: boolean
 }
 
-export default App
+export default class App extends Component<{}, AppState> {
+  state = {
+    showTime: true,
+    showDate: false,
+  }
+
+  render() {
+    const yesterday = new XDate().addDays(-1)
+    const today = new XDate()
+    const tomorrow = new XDate().addDays(1)
+
+    const slots: SlotMap = {}
+    // 2019-12-31 -> YYYY-MM-DD
+    slots[getDate(yesterday)] = [
+      {
+        time: yesterday.toDate(),
+        enabled: true,
+      },
+      {
+        time: new XDate(yesterday).addHours(1).toDate(),
+        enabled: false,
+      },
+    ]
+
+    slots[getDate(today)] = [
+      {
+        time: new XDate(today).addHours(-1).toDate(),
+        enabled: true,
+      },
+      {
+        time: today.toDate(),
+        enabled: true,
+      },
+      {
+        time: new XDate(today).addHours(1).toDate(),
+        enabled: false,
+      },
+    ]
+
+    slots[getDate(tomorrow)] = [
+      {
+        time: new XDate(tomorrow).addHours(-1).toDate(),
+        enabled: true,
+      },
+      {
+        time: tomorrow.toDate(),
+        enabled: true,
+      },
+      {
+        time: new XDate(tomorrow).addHours(1).toDate(),
+        enabled: true,
+      },
+    ]
+
+    const { date, slot, showDate, showTime } = this.state
+
+    return (
+      <Fragment>
+        <StatusBar barStyle="dark-content" />
+        <SafeAreaView>
+          <ScrollView contentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
+            <ScheduleHeader
+              date={date ? date.toString() : 'Undefined date'}
+              time={slot ? slot.time.toTimeString() : 'Undefined time'}
+              onPressTime={() =>
+                this.setState({
+                  showDate: false,
+                  showTime: !showTime,
+                })
+              }
+              onPressDate={() =>
+                this.setState({
+                  showDate: !showDate,
+                  showTime: false,
+                })
+              }
+            />
+            <ScheduleView
+              slots={slots}
+              showDate={showDate}
+              showTime={showTime}
+              formatDay={(day: DayKey) => day}
+              formatTime={(slot: Slot) => `${slot.time.getHours()}:${slot.time.getMinutes()}`}
+              onDateChanges={(date: DayKey | null, slot: Slot | null) => {
+                this.setState({
+                  date: date,
+                  slot: slot,
+                })
+              }}
+            />
+          </ScrollView>
+        </SafeAreaView>
+      </Fragment>
+    )
+  }
+}
