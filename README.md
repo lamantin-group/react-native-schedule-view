@@ -1,9 +1,31 @@
-What is it
+react-native-schedule-view
 ----------
 
-React-Native implementation of time schedule.
+Pure TS implementation of time table schedule for react-native.
 
 ![v1](.github/v1.gif)
+
+- Navigate by months inside year (Calendar)
+- Navigate by days inside month (TimeCalendar)
+- Select only active time slot from schedule table
+- Custom rendering for: day, time, header, pattern formatters, arrows and etc.
+- isLoading property for showing download large data-set of slots for month
+- Supporting next states for day and time: disabled, common, today and selected
+- Calendar depend upon [react-native-calendars:v1.212.0](https://github.com/wix/react-native-calendars)
+
+
+Install
+-------
+
+```bash
+npm install --save react-native-schedule-view
+```
+
+or
+
+```bash
+yarn add --save react-native-schedule-view
+```
 
 Example
 -------
