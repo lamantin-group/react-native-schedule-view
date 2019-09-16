@@ -203,7 +203,8 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       renderArrow,
       formatTime,
     } = this.props
-    const markedDates: { [day: string]: MarkedDay } = { ...slots }
+    const markedDates: { [day: string]: MarkedDay } = {}
+
     if (showDate) {
       const today = new Date().toISOString().slice(0, 10) // yyyy-mm-dd
       Object.keys(slots).forEach(key => {
@@ -220,7 +221,6 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       return (
         <Calendar
           displayLoadingIndicator={isLoading}
-          markingType="custom"
           markedDates={markedDates}
           onMonthChange={date => {
             onMonthChanges && onMonthChanges(date.year, date.month)

@@ -9,6 +9,7 @@
 import * as React from 'react'
 import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 export import LocaleConfig = require('xdate')
+import { SlotMap, MarkedDay } from '../Types'
 
 export interface DateObject {
   day: number
@@ -53,15 +54,15 @@ export interface CalendarTheme {
   indicatorColor?: string
 
   // Theme ID's to style for
-  "stylesheet.calendar.header"?: CalendarThemeIdStyle
-  "stylesheet.calendar.main"?: CalendarThemeIdStyle
-  "stylesheet.calendar-list.main"?: CalendarThemeIdStyle
-  "stylesheet.agenda.main"?: CalendarThemeIdStyle
-  "stylesheet.agenda.list"?: CalendarThemeIdStyle
-  "stylesheet.day.basic"?: CalendarThemeIdStyle
-  "stylesheet.day.single"?: CalendarThemeIdStyle
-  "stylesheet.day.multiDot"?: CalendarThemeIdStyle
-  "stylesheet.day.period"?: CalendarThemeIdStyle
+  'stylesheet.calendar.header'?: CalendarThemeIdStyle
+  'stylesheet.calendar.main'?: CalendarThemeIdStyle
+  'stylesheet.calendar-list.main'?: CalendarThemeIdStyle
+  'stylesheet.agenda.main'?: CalendarThemeIdStyle
+  'stylesheet.agenda.list'?: CalendarThemeIdStyle
+  'stylesheet.day.basic'?: CalendarThemeIdStyle
+  'stylesheet.day.single'?: CalendarThemeIdStyle
+  'stylesheet.day.multiDot'?: CalendarThemeIdStyle
+  'stylesheet.day.period'?: CalendarThemeIdStyle
 }
 
 export type DateCallbackHandler = (date: DateObject) => void
@@ -173,7 +174,7 @@ export type CalendarMarkingProps =
 
 export interface DayComponentProps {
   date: DateObject
-  marking: false | Marking[]
+  marking: MarkedDay
   onPress: (date: DateObject) => any
   onLongPress: (date: DateObject) => any
   state: '' | 'selected' | 'disabled' | 'today'
