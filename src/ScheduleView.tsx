@@ -33,7 +33,7 @@ export interface ScheduleViewProps {
 
   mapSlotsToSingleDay?: (day: DayKey, slots: Slot[]) => MarkedDay
 
-  onDateChanges?: (date: DayKey | null, slot: Slot | null) => void
+  onDateChanges?: (date?: DayKey, slot?: Slot) => void
   onMonthChanges?: (year: number, month: number) => void
 
   /**
@@ -52,8 +52,8 @@ export interface ScheduleViewProps {
 }
 
 export interface ScheduleViewState {
-  selectedDate: DayKey | null // key for map of slots
-  selectedSlot: Slot | null
+  selectedDate?: DayKey // key for map of slots
+  selectedSlot?: Slot
   currentDateHack: Date // used for navigate by calendar months
 }
 
@@ -149,8 +149,8 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
   constructor(props: ScheduleViewProps) {
     super(props)
     this.state = {
-      selectedDate: null,
-      selectedSlot: null,
+      selectedDate: undefined,
+      selectedSlot: undefined,
       currentDateHack: new Date(),
     }
   }
@@ -185,8 +185,8 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
 
   clearTime() {
     this.setState({
-      selectedDate: null,
-      selectedSlot: null,
+      selectedDate: undefined,
+      selectedSlot: undefined,
     })
   }
 
@@ -203,7 +203,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       renderArrow,
       formatTime,
     } = this.props
-    const markedDates: { [day: string]: MarkedDay } = Object.keys(slots)
+    const markedDates: { [day: string]: MarkedDay } = { ...slots }
     if (showDate) {
       const today = new Date().toISOString().slice(0, 10) // yyyy-mm-dd
       Object.keys(slots).forEach(key => {
