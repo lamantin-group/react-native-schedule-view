@@ -73,8 +73,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     slots: [],
     keyExtractor: (slot: Slot) => slot.id,
     renderSlot: (props: any, slot: Slot) => {
-      // return <Text>{props.timeFormatter(slot.time)}</Text>
-      return <Text>{''}</Text>
+      return <Text>{props.timeFormatter(slot.time)}</Text>
     },
     timeFormatter: (time: any) => time,
     dateFormatter: (time: Date) => time,
@@ -82,7 +81,9 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     onSlotSelected: (dayKey: DayKey, slot: Slot) => {
       console.warn('not implemented onSelectedSlot: ' + JSON.stringify(slot))
     },
-    style: {},
+    style: {
+      backgroundColor: 'white',
+    },
     strings: {
       no_available_times: 'No have available slots',
     },
@@ -166,6 +167,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
           justifyContent: 'space-between',
           paddingVertical: 12,
           paddingHorizontal: 16,
+          marginVertical: 16,
           alignItems: 'center',
         }}>
         {hasPrevDay && (
@@ -173,7 +175,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
             style={{
               position: 'absolute',
               zIndex: 1,
-              left: 16,
+              left: 24,
             }}
             onPress={() => {
               this.onClickPrevDay(indexOfDay, days)
@@ -200,7 +202,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
           <TouchableOpacity
             style={{
               position: 'absolute',
-              end: 16,
+              end: 24,
               zIndex: 1,
             }}
             onPress={() => {
@@ -244,7 +246,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     const rows = chunk(daySlots, columns)
 
     return (
-      <View style={style}>
+      <View style={[{ paddingBottom: 4 }, style]}>
         {this.renderHeader(slots, showDate, dateFormatter)}
         {rows.map((column, indexColumn) => (
           <View

@@ -159,7 +159,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
     super(props)
     this.state = {
       showCalendar: false,
-      showTime: false,
+      showTime: true, // todo: fix to false
       selectedDate: null,
       selectedSlot: null,
       showCancel: false,
@@ -181,10 +181,11 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
         showCancel: !!(selectedDate || selectedSlot),
         currentDateHack: selectedDate ? new Date(selectedDate) : new Date(),
       }
-      if (isSlotChanges) {
-        payload.showTime = false
-        payload.showCalendar = false
-      }
+      // ? need close schedule after select slot
+      // if (isSlotChanges) {
+      //   payload.showTime = false
+      //   payload.showCalendar = false
+      // }
       this.setState(payload)
       onDateChanges && onDateChanges(selectedDate, selectedSlot)
     }
