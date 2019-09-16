@@ -102,7 +102,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
             color: 'transparent',
           },
           text: {
-            color: 'gray',
+            color: 'black',
           },
         }
       }
@@ -111,6 +111,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
         style = Object.assign(style, {
           circle: {
             color: 'transparent',
+            borderColor: 'black',
           },
           text: {
             color: 'black',
@@ -130,11 +131,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       }
 
       return (
-        <Circle
-          color={style.circle.color}
-          borderColor={style.circle.color}
-          size={28}
-          borderWidth={1}>
+        <Circle {...style.circle} size={28} borderWidth={1}>
           <Text style={{ color: style.text.color }}>{dayProps.dateObject.day}</Text>
         </Circle>
       )

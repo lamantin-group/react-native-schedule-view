@@ -61,20 +61,58 @@ const styles = StyleSheet.create({
 import { ScheduleView, DayKey, Slot } from 'react-native-library'
 import { SlotMap } from '../src/Slot'
 
+function getDate(xDate: XDate): string {
+  return xDate.toISOString().slice(0, 10)
+}
+
 const App = () => {
-  const usingHermes = typeof HermesInternal === 'object' && HermesInternal !== null
-  const slots: SlotMap = {
-    '2019-09-16': [
-      {
-        time: new Date(),
-        enabled: true,
-      },
-      {
-        time: new XDate(new Date()).addHours(1).toDate(),
-        enabled: false,
-      },
-    ],
-  }
+  const yesterday = new XDate().addDays(-1)
+  const today = new XDate()
+  const tomorrow = new XDate().addDays(1)
+
+  const slots: SlotMap = {}
+  // 2019-12-31 -> YYYY-MM-DD
+  slots[getDate(yesterday)] = [
+    {
+      time: yesterday.toDate(),
+      enabled: true,
+    },
+    {
+      time: new XDate(yesterday).addHours(1).toDate(),
+      enabled: false,
+    },
+  ]
+
+  slots[getDate(today)] = [
+    {
+      time: new XDate(today).addHours(-1).toDate(),
+      enabled: true,
+    },
+    {
+      time: today.toDate(),
+      enabled: true,
+    },
+    {
+      time: new XDate(today).addHours(1).toDate(),
+      enabled: false,
+    },
+  ]
+
+  slots[getDate(tomorrow)] = [
+    {
+      time: new XDate(tomorrow).addHours(-1).toDate(),
+      enabled: true,
+    },
+    {
+      time: tomorrow.toDate(),
+      enabled: true,
+    },
+    {
+      time: new XDate(tomorrow).addHours(1).toDate(),
+      enabled: true,
+    },
+  ]
+
   return (
     <Fragment>
       <StatusBar barStyle="dark-content" />
