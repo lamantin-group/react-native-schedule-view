@@ -333,7 +333,16 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
             }
             return (
               <ClickableView key={props.key} onPress={props.onPress} disabled={disabled}>
-                <StateView enabled={!disabled}>{renderTime!(slotProps)}</StateView>
+                <StateView
+                  enabled={!disabled}
+                  style={{
+                    borderColor: 'gray',
+                    borderWidth: selected ? 1 : 0,
+                    padding: 4,
+                    borderRadius: 4,
+                  }}>
+                  {renderTime!(slotProps)}
+                </StateView>
               </ClickableView>
             )
           }}
