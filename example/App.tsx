@@ -118,7 +118,10 @@ const App = () => {
       <StatusBar barStyle="dark-content" />
       <SafeAreaView>
         <ScrollView contentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
-          <ScheduleView slots={slots} />
+          <ScheduleView
+            slots={slots}
+            formatTime={(slot: Slot) => `${slot.time.getHours()}:${slot.time.getMinutes()}`}
+          />
         </ScrollView>
       </SafeAreaView>
     </Fragment>

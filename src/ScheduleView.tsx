@@ -26,7 +26,7 @@ export interface ScheduleViewProps {
   onMonthChanges?: (year: number, month: number) => void
 
   formatterSelectedDay?: (date: DayKey) => string
-  formatterSelectedTime?: (slot: Slot) => string
+  formatTime?: (slot: Slot) => string
 
   strings?: {
     select_date: string
@@ -62,6 +62,7 @@ export type DayProps = {
 }
 
 export type SlotProps = {
+  formatter: (slot: Slot) => string
   selected: boolean
   enabled: boolean
   slot: Slot
@@ -76,7 +77,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
     },
     onDateChanges: (date: Date, slot?: Slot) => {},
     formatterSelectedDay: (date: Date) => date,
-    formatterSelectedTime: (slot: Slot) => slot.time.toLocaleTimeString(),
+    formatTime: (slot: Slot) => slot.time.toLocaleTimeString(),
     isLoading: false,
     onMonthChanges: (year: number, month: number) => {},
 
@@ -151,7 +152,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       )
     },
     renderTime: (slotProps: SlotProps) => {
-      return <Text>{slotProps.slot.time.toLocaleTimeString()}</Text>
+      return <Text>{slotProps.formatter(slotProps.slot)}</Text>
     },
   }
 
@@ -226,6 +227,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       renderDay,
       renderTime,
       renderArrow,
+      formatTime,
     } = this.props
     const markedDates: { [day: string]: MarkedDay } = { ...slots }
     if (showCalendar) {
@@ -328,6 +330,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
               })
             }
             const slotProps: SlotProps = {
+              formatter: formatTime,
               selected: selected,
               enabled: !disabled,
               slot: slot,
@@ -342,7 +345,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
                     padding: 4,
                     borderRadius: 4,
                   }}>
-                  {renderTime!(slotProps)}
+                  {renderTime && renderTime(slotProps)}
                 </StateView>
               </ClickableView>
             )
@@ -355,11 +358,11 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
   }
 
   render() {
-    const { style, strings, formatterSelectedDay, formatterSelectedTime } = this.props
+    const { style, strings, formatterSelectedDay, formatTime } = this.props
     const { selectedDate, selectedSlot, showCancel } = this.state
 
     const titleDate = selectedDate ? formatterSelectedDay!(selectedDate) : strings!.select_date
-    const titleTime = selectedSlot ? formatterSelectedTime!(selectedSlot) : strings!.select_time
+    const titleTime = selectedSlot ? formatTime!(selectedSlot) : strings!.select_time
 
     return (
       <View
