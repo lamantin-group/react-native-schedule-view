@@ -1,14 +1,55 @@
 What is it
 ----------
 
-React-Native implementation of table schedule
+React-Native implementation of time schedule.
 
-How to use it
--------------
+![v1](.github/v1.gif)
 
+Example
+-------
+You can specify and show your own table schedule by passing `slots` object-map to `ScheduleView`.
+
+```js
+import { ScheduleView, DayKey, Slot } from 'react-native-library'
+
+<ScheduleView
+  slots={{
+    '2019-12-31': [{
+      time: new Date().setMinutes(0),
+      enabled: true
+    }, {
+      time: new Date().setMinutes(30),
+      enabled: true
+    }]
+  }}
+  showDate={false} // show date selector
+  showTime={true} // show time slot selector
+  onDateChanges={(date?: DayKey, slot?: Slot) => {
+    this.setState({
+      date: date, // selected date
+      slot: slot, // selected time slot
+    })
+  }}
+  // optional params below
+  isLoading={false}
+  renderArrow={(direction: 'left' | 'right') => <MyArrowView direction={direction} />}
+  renderDay={dayProps => {
+    const { enabled, selected, today, dateObject } = dayProps
+    const { day, month, year, dateString } = dateObject
+    return <MyDayView {...dayProps} />
+  }}
+  renderTime={slotProps => {
+    const { slot, enabled, selected, formatter } = slotProps
+    return <MyTimeSlotView {...slotProps} text={formatter(slot)} />
+  }}
+  formatDate={(date: DayKey) => date}
+  onMonthChanges={(year: number, month: number) => console.log(`${year} ${month}`)}
+/>
 ```
-work in progress
-```
+
+If you have any question or problem, feel free to open an issue.
+
+---
 
 ```
 The MIT License

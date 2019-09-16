@@ -27,7 +27,7 @@ export type DayProps = {
 }
 
 export type SlotProps = {
-  formatter?: (slot: Slot) => string
+  formatter: (slot: Slot) => string
   selected: boolean
   enabled: boolean
   slot: Slot

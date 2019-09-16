@@ -196,6 +196,28 @@ export default class App extends Component<{}, AppState> {
                   slot: slot,
                 })
               }}
+
+              // // optional
+              // renderArrow={(direction: 'left' | 'right') => <MyArrowView direction={direction} />}
+
+              // // optional
+              // renderDay={dayProps => {
+              //   const { enabled, selected, today, dateObject } = dayProps
+              //   const { day, month, year, dateString } = dateObject
+              //   return <MyDayView {...dayProps} />
+              // }}
+
+              // // optional
+              // renderTime={slotProps => {
+              //   const { slot, enabled, selected, formatter } = slotProps
+              //   return <MyTimeSlotView {...slotProps} text={formatter(slot)} />
+              // }}
+
+              // // optional
+              // formatDate={(date: DayKey) => date}
+
+              // // optional
+              // onMonthChanges={(year: number, month: number) => console.log(`${year} ${month}`)}
             />
 
             <Text style={{ fontSize: 18, marginTop: 24 }}>Slots</Text>
