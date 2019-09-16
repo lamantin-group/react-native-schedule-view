@@ -72,6 +72,7 @@ interface AppState {
   slot?: Slot | null
   showTime: boolean
   showDate: boolean
+  isLoading: boolean
   slots: SlotMap
 }
 
@@ -127,11 +128,12 @@ export default class App extends Component<{}, AppState> {
       slots,
       showTime: true,
       showDate: false,
+      isLoading: false,
     }
   }
 
   render() {
-    const { date, slot, showDate, showTime, slots } = this.state
+    const { date, slot, showDate, showTime, slots, isLoading } = this.state
 
     return (
       <Fragment>
@@ -158,6 +160,13 @@ export default class App extends Component<{}, AppState> {
               onChanges={checked => this.setState({ showTime: checked })}
             />
 
+            <SwitchView
+              style={{ marginBottom: 16 }}
+              checked={isLoading}
+              title="isLoading"
+              onChanges={checked => this.setState({ isLoading: checked })}
+            />
+
             <ScheduleHeader
               date={date ? date.toString() : 'Select date'}
               time={slot ? `${slot.time.getHours()}:${slot.time.getMinutes()}` : 'Select time'}
@@ -177,6 +186,7 @@ export default class App extends Component<{}, AppState> {
             <View style={{ height: 1 }} />
             <ScheduleView
               slots={slots}
+              isLoading={isLoading}
               showDate={showDate}
               showTime={showTime}
               formatTime={(slot: Slot) => `${slot.time.getHours()}:${slot.time.getMinutes()}`}
