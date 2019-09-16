@@ -59,15 +59,17 @@ const styles = StyleSheet.create({
 })
 
 import { ScheduleView, DayKey, Slot } from 'react-native-library'
+import { SlotMap } from '../src/Slot'
 
 const App = () => {
   const usingHermes = typeof HermesInternal === 'object' && HermesInternal !== null
-  const slots = new Map<DayKey, Slot[]>()
-  slots.set('2019-09-13', [
-    {
-      time: new Date(),
-    },
-  ])
+  const slots: SlotMap = {
+    '2019-09-16': [
+      {
+        time: new Date(),
+      },
+    ],
+  }
   return (
     <Fragment>
       <StatusBar barStyle="dark-content" />

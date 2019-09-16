@@ -8,11 +8,17 @@ import { DayKey } from './DayKey'
 import { Slot, SlotMap } from './Slot'
 import { StateView } from './StateView'
 import { TimeCalendar } from './TimeCalendar'
+import { DateObject } from 'react-native-calendars'
 export interface ScheduleViewProps {
   slots: SlotMap
 
   style?: ViewStyle
   isLoading?: boolean
+  today?: Date
+
+  renderDay?: (dayProps: DayProps) => React.ReactNode
+
+  mapSlotsToSingleDay?: (day: DayKey, slots: Slot[]) => MarkedDay
 
   onDateChanges?: (date: DayKey | null, slot: Slot | null) => void
   onMonthChanges?: (year: number, month: number) => void
@@ -37,19 +43,29 @@ export interface ScheduleViewState {
   currentDateHack: Date // used for navigate by calendar months
 }
 
-type Marked = {
+export type Marked = {
   today: boolean
   selected: boolean
   marked: boolean
   enabled: boolean
   manual: boolean
 }
-type MarkedSlot = Slot | Marked
+export type MarkedDay = Marked
+
+export type DayProps = {
+  dateObject: DateObject
+  enabled: boolean
+  selected: boolean
+  today: boolean
+}
 
 export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState> {
   static defaultProps = {
     style: {},
     slots: {},
+    mapSlotsToSingleDay: () => {
+      return {}
+    },
     onDateChanges: (date: Date, slot?: Slot) => {},
     formatterSelectedDay: (date: Date) => date,
     formatterSelectedTime: (slot: Slot) => slot.time,
@@ -61,6 +77,60 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       select_time: 'Select time',
       time: 'Time',
       date: 'Date',
+    },
+
+    renderDay: (dayProps: DayProps) => {
+      let style = {
+        circle: {
+          color: 'transparent',
+        },
+        text: {
+          color: 'gray',
+        },
+      }
+
+      if (dayProps.enabled) {
+        style = {
+          circle: {
+            color: 'transparent',
+          },
+          text: {
+            color: 'gray',
+          },
+        }
+      }
+
+      if (dayProps.today) {
+        style = Object.assign(style, {
+          circle: {
+            color: 'transparent',
+          },
+          text: {
+            color: 'black',
+          },
+        })
+      }
+
+      if (dayProps.selected) {
+        style = Object.assign(style, {
+          circle: {
+            color: 'gray',
+          },
+          text: {
+            color: 'white',
+          },
+        })
+      }
+
+      return (
+        <Circle
+          color={style.circle.color}
+          borderColor={style.circle.color}
+          size={28}
+          borderWidth={1}>
+          <Text style={{ color: style.text.color }}>{dayProps.dateObject.day}</Text>
+        </Circle>
+      )
     },
   }
 
@@ -126,8 +196,8 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
 
   renderBottomView() {
     const { showCalendar, showTime, selectedDate, selectedSlot, currentDateHack } = this.state
-    const { slots, isLoading, onMonthChanges } = this.props
-    const markedDates: { [day: string]: MarkedSlot[] } = { ...slots }
+    const { slots, isLoading, onMonthChanges, mapSlotsToSingleDay, renderDay } = this.props
+    const markedDates: { [day: string]: MarkedDay } = { ...slots }
     if (showCalendar) {
       const today = new Date().toISOString().slice(0, 10) // yyyy-mm-dd
       Object.keys(slots).forEach(key => {
@@ -136,26 +206,21 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
         // const isHasDoctors = firstTimeSlot.availableDoctorsCount > 0 // todo: move it into props function
         // const isHasDoctors = !!_.find(timeSlots, element => element.availableDoctorsCount > 0) // todo: move it into props function
         // const isHasDoctors = true // todo: move it into props function
-        // markedDates[key] = {
-        //   // ...original,
-        //   today: key === today,
-        //   selected: key === selectedDate,
-        //   marked: true,
-        //   enabled: isHasDoctors,
-        //   manual: true,
-        //   // disableTouchEvent: !isHasDoctors,
-        // }
+        markedDates[key] = {
+          today: key === today,
+          selected: key === selectedDate,
+          marked: true,
+          enabled: true,
+          manual: true,
+          ...mapSlotsToSingleDay!(key, slots[key]),
+        }
       })
 
       return (
         <Calendar
           displayLoadingIndicator={isLoading}
-          // markingType="custom"
-          markedDates={{
-            '2019-09-12': { marked: true },
-            '2019-09-13': { marked: true, dotColor: 'red', activeOpacity: 0 },
-            '2019-09-14': { disabled: true, disableTouchEvent: true },
-          }}
+          markingType="custom"
+          markedDates={markedDates}
           onMonthChange={date => {
             onMonthChanges && onMonthChanges(date.year, date.month)
           }}
@@ -180,26 +245,19 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
             console.log(props)
             const { date } = props
 
-            // const isEnabled = props.marking.manual
-            //   ? props.marking.enabled
-            //   : props.state !== 'disabled'
-            // const isSelected = props.marking.selected
-            // const isToday = props.marking.today
+            const isEnabled = props.marking.manual
+              ? props.marking.enabled
+              : props.state !== 'disabled'
 
-            // let style = { ...styleDisabled }
-            const style = {}
+            const isSelected = props.marking.selected
+            const isToday = props.marking.today
 
-            // if (isEnabled) {
-            // style = { ...styleDay }
-            // }
-
-            // if (isToday) {
-            // style = Object.assign(style, styleToday)
-            // }
-
-            // if (isSelected) {
-            // style = Object.assign(style, styleSelected)
-            // }
+            const dayProps: DayProps = {
+              enabled: isEnabled,
+              selected: isSelected,
+              today: isToday,
+              dateObject: date,
+            }
 
             return (
               <ClickableView
@@ -208,19 +266,8 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
                     selectedDate: date.dateString,
                   })
                 }
-                // disabled={!isEnabled}>
-                disabled={false}>
-                {/* <Circle size={28} {...style.circle}> */}
-                <Circle size={28}>
-                  <Text
-                    style={{
-                      // ...textStyles.common,
-                      textAlign: 'center',
-                      // ...style.text,
-                    }}>
-                    {date.day}
-                  </Text>
-                </Circle>
+                disabled={!isEnabled}>
+                {renderDay && renderDay(dayProps)}
               </ClickableView>
             )
           }}
@@ -290,71 +337,6 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
           }}
         />
       )
-      // return (
-      //   <TimeCalendar
-      //     slots={slots}
-      //     timeFormatter={time => TimeHelper.formatTime(time)}
-      //     dateFormatter={date => TimeHelper.format(date, TimeHelper.PATTERN_DATE_WITH_DAY_OF_WEEK)}
-      //     keyExtractor={slot => slot.displayDateTime}
-      //     renderTime={(props, slot) => {
-      //       let textStyle = stylesTime.common
-      //       const containerStyle = {
-      //         borderRadius: 4,
-      //         paddingHorizontal: 8,
-      //         marginVertical: 4,
-      //         flex: 1,
-      //         justifyContent: 'center',
-      //         alignItems: 'center',
-      //       }
-      //       const selected = slot.displayDateTime === (selectedSlot || {}).displayDateTime
-      //       const disabled = slot.availableDoctorsCount <= 0
-      //       const { promoted } = slot
-
-      //       if (disabled) textStyle = stylesTime.disabled
-      //       if (promoted) {
-      //         textStyle = stylesTime.promoted
-      //         containerStyle.borderWidth = 1
-      //         containerStyle.borderColor = colors.divider
-      //       }
-      //       if (selected) {
-      //         textStyle = stylesTime.selected
-      //         containerStyle.backgroundColor = colors.divider
-      //       }
-
-      //       // todo: need refactor this place should be in another place, not in render
-      //       // this determinate state, where user select date and after fetch new slots, this slot was disabled
-      //       if (disabled && selected) {
-      //         this.setState({
-      //           selectedSlot: null,
-      //         })
-      //       }
-
-      //       return (
-      //         <StateView
-      //           {...props}
-      //           enabled={!disabled}
-      //           style={{
-      //             ...containerStyle,
-      //           }}>
-      //           <Text
-      //             style={{
-      //               ...textStyle,
-      //               paddingVertical: 5,
-      //             }}>
-      //             {slot.displayTime}
-      //           </Text>
-      //         </StateView>
-      //       )
-      //     }}
-      //     selectedDate={selectedDate}
-      //     onSelectedSlot={slot => {
-      //       this.setState({
-      //         selectedSlot: slot,
-      //         selectedDate: slot.displayDate,
-      //       })
-      //     }}
-      //   />
-      // )
     }
 
     return null

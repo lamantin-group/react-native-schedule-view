@@ -26,6 +26,7 @@ export interface TimeCalendarProps {
     props: {
       onPress: () => void
       key: string
+      timeFormatter: (time: Date) => string
     },
     slot: Slot
   ) => React.ReactNode
@@ -35,7 +36,7 @@ export interface TimeCalendarProps {
    */
   onSlotSelected: (date: DayKey, slot: Slot) => void
 
-  selectedDate: DayKey | null
+  selectedDate: DayKey | null | undefined
 
   /**
    * Number of columns
@@ -52,8 +53,8 @@ export interface TimeCalendarProps {
 
   style?: ViewStyle
 
-  timeFormatter: (time: any) => string
-  dateFormatter: (date: any) => string
+  timeFormatter: (time: Date) => string
+  dateFormatter: (date: DayKey) => string
 }
 
 export interface TimeCalendarState {
@@ -69,20 +70,25 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     columns: 4,
     slots: [],
     keyExtractor: (slot: Slot) => slot.id,
-    renderSlot: (slot: Slot) => {
-      return <Text>{slot.time}</Text>
+    renderSlot: (props: any, slot: Slot) => {
+      // return <Text>{props.timeFormatter(slot.time)}</Text>
+      return <Text>{''}</Text>
     },
     timeFormatter: (time: any) => time,
-    dateFormatter: (time: any) => time,
+    dateFormatter: (time: Date) => time,
     // onSelectedNewDate: null,
     onSlotSelected: (dayKey: DayKey, slot: Slot) => {
       console.warn('not implemented onSelectedSlot: ' + JSON.stringify(slot))
     },
-    selectedDate: null,
     style: {},
     strings: {
       no_available_times: 'No have available slots',
     },
+  }
+
+  state = {
+    showDate: undefined,
+    changeDayClicked: false,
   }
 
   componentDidMount() {
@@ -94,6 +100,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
 
     this.setState({
       showDate: showDate,
+      changeDayClicked: false,
     })
   }
 
@@ -102,7 +109,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     prevState: Readonly<TimeCalendarState>
   ) {
     const { selectedDate } = this.props
-    const { showDate, changeDayClicked } = this.state
+    const { changeDayClicked } = this.state
 
     if (changeDayClicked) {
       // do not update state
@@ -143,7 +150,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     // const indexOfDay = indexOf(formattedDays, element => {
     //   return element === TimeHelper.format(date, TimeHelper.PATTERN_YEAR_MONTH_DAY)
     // })
-    const days = Object.keys(slots.keys)
+    const days = Object.keys(slots)
     const indexOfDay = days.findIndex(day => day === showDate)
 
     const hasPrevDay = indexOfDay !== 0
@@ -242,8 +249,9 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
             {column.map(slot => {
               return renderSlot(
                 {
-                  onPress: () => onSlotSelected(showDate, slot),
+                  onPress: () => onSlotSelected(showDate!, slot),
                   key: keyExtractor(slot),
+                  timeFormatter: timeFormatter,
                 },
                 slot
               )
