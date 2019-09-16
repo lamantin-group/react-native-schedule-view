@@ -23,7 +23,7 @@ export function chunk<T>(array: T[], length: number): T[][] {
 export interface TimeCalendarProps {
   slots: SlotMap
 
-  renderArrow: (direction: 'left' | 'right') => React.ReactNode
+  renderArrow?: (direction: 'left' | 'right') => React.ReactNode
   renderSlot: (
     props: {
       onPress: () => void
