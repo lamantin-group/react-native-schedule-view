@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, ViewStyle } from 'react-native'
+import { Text, View, ViewStyle, Image } from 'react-native'
 import { Calendar } from './react-native-calendars'
 import XDate from 'xdate'
 import { Circle } from './Circle'
@@ -18,6 +18,7 @@ export interface ScheduleViewProps {
 
   renderDay?: (dayProps: DayProps) => React.ReactNode
   renderTime?: (slotProps: SlotProps) => React.ReactNode
+  renderArrow?: (direction: 'left' | 'right') => React.ReactNode
 
   mapSlotsToSingleDay?: (day: DayKey, slots: Slot[]) => MarkedDay
 
@@ -86,6 +87,19 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       date: 'Date',
     },
 
+    renderArrow: (direction: 'left' | 'right') => {
+      // return null
+      return (
+        <Image
+          style={{
+            height: 24,
+            width: 24,
+            transform: [{ rotate: direction === 'left' ? '180deg' : '0deg' }],
+          }}
+          source={require('../assets/ic_arrow/ic_arrow.png')}
+        />
+      )
+    },
     renderDay: (dayProps: DayProps) => {
       let style = {
         circle: {
@@ -210,6 +224,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       mapSlotsToSingleDay,
       renderDay,
       renderTime,
+      renderArrow,
     } = this.props
     const markedDates: { [day: string]: MarkedDay } = { ...slots }
     if (showCalendar) {
@@ -240,6 +255,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
           }}
           current={currentDateHack}
           disabledByDefault
+          renderArrow={renderArrow}
           hideExtraDays
           onPressArrowRight={addMonth => {
             const nextMonth = new XDate(currentDateHack).addMonths(1)
