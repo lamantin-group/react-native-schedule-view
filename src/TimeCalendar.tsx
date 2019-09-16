@@ -175,7 +175,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
             style={{
               position: 'absolute',
               zIndex: 1,
-              left: 24,
+              left: 25,
             }}
             onPress={() => {
               this.onClickPrevDay(indexOfDay, days)
@@ -202,7 +202,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
           <TouchableOpacity
             style={{
               position: 'absolute',
-              end: 24,
+              end: 25,
               zIndex: 1,
             }}
             onPress={() => {
