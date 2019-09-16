@@ -1,14 +1,22 @@
 import React, { Component } from 'react'
-import { Text, View, ViewStyle, Image } from 'react-native'
-import { Calendar } from './react-native-calendars'
+import { Image, Text, View, ViewStyle } from 'react-native'
 import XDate from 'xdate'
 import { Circle } from './Circle'
 import { ClickableView } from './ClickableView'
-import { DayKey } from './DayKey'
-import { Slot, SlotMap } from './Slot'
+import { DayKey } from './Types'
+import { Calendar } from './react-native-calendars'
 import { StateView } from './StateView'
 import { TimeCalendar } from './TimeCalendar'
-import { DateObject } from 'react-native-calendars'
+import {
+  DayProps,
+  MarkedDay,
+  Slot,
+  SlotMap,
+  SlotProps,
+  StringsDateCalendar,
+  StringsTimeCalendar,
+} from './Types'
+
 export interface ScheduleViewProps {
   slots: SlotMap
 
@@ -40,41 +48,13 @@ export interface ScheduleViewProps {
 
   formatTime?: (slot: Slot) => string
 
-  strings?: {
-    select_date: string
-    select_time: string
-    date: string
-    time: string
-  }
+  strings?: StringsTimeCalendar | StringsDateCalendar
 }
 
 export interface ScheduleViewState {
   selectedDate: DayKey | null // key for map of slots
   selectedSlot: Slot | null
   currentDateHack: Date // used for navigate by calendar months
-}
-
-export type Marked = {
-  today: boolean
-  selected: boolean
-  marked: boolean
-  enabled: boolean
-  manual: boolean
-}
-export type MarkedDay = Marked
-
-export type DayProps = {
-  dateObject: DateObject
-  enabled: boolean
-  selected: boolean
-  today: boolean
-}
-
-export type SlotProps = {
-  formatter?: (slot: Slot) => string
-  selected: boolean
-  enabled: boolean
-  slot: Slot
 }
 
 export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState> {
@@ -92,8 +72,8 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
     onMonthChanges: (year: number, month: number) => {},
 
     strings: {
-      select_date: 'Select date',
-      select_time: 'Select time',
+      selectDate: 'Select date',
+      selectTime: 'Select time',
       time: 'Time',
       date: 'Date',
     },
@@ -162,7 +142,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       )
     },
     renderTime: (slotProps: SlotProps) => {
-      return <Text>{slotProps.formatter(slotProps.slot)}</Text>
+      return <Text>{slotProps.formatter && slotProps.formatter(slotProps.slot)}</Text>
     },
   }
 
@@ -223,7 +203,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       renderArrow,
       formatTime,
     } = this.props
-    const markedDates: { [day: string]: MarkedDay } = { ...slots }
+    const markedDates: { [day: string]: MarkedDay } = Object.keys(slots)
     if (showDate) {
       const today = new Date().toISOString().slice(0, 10) // yyyy-mm-dd
       Object.keys(slots).forEach(key => {

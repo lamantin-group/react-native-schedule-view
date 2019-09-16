@@ -1,10 +1,6 @@
-import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { Text, View, ViewStyle, TouchableOpacity } from 'react-native'
-import { Slot, SlotMap } from './Slot'
-import { DayKey } from './DayKey'
-import { StateView } from './StateView'
-import XDate from 'xdate'
+import { Text, TouchableOpacity, View, ViewStyle } from 'react-native'
+import { Slot, SlotMap, DayKey, StringsTimeCalendar } from './Types'
 
 /**
  * Split array into chunks by predifined length
@@ -39,25 +35,22 @@ export interface TimeCalendarProps {
    */
   onSlotSelected: (date: DayKey, slot: Slot) => void
 
-  selectedDate: DayKey | null | undefined
+  selectedDate?: DayKey
 
   /**
    * Number of columns
    *
    * @default 4
    */
-  columns: number
+  columns?: number
 
-  strings: {
-    no_available_times: string
-  } | null
+  strings?: StringsTimeCalendar
 
-  keyExtractor: (slot: Slot) => string
+  keyExtractor?: (slot: Slot) => string
 
   style?: ViewStyle
 
-  timeFormatter: (time: Date) => string
-  dateFormatter: (date: DayKey) => string
+  timeFormatter?: (time: Date) => string
   formatHeaderDay?: (day: DayKey) => string
 }
 
@@ -70,10 +63,10 @@ export interface TimeCalendarState {
 }
 
 export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState> {
-  static defaultProps = {
+  static defaultProps: TimeCalendarProps = {
     columns: 4,
-    slots: [],
-    keyExtractor: (slot: Slot) => slot.id,
+    slots: {},
+    keyExtractor: (slot: Slot) => slot.id || slot.time.toUTCString(),
     renderSlot: (props: any, slot: Slot) => {
       return <Text>{props.timeFormatter(slot.time)}</Text>
     },
@@ -90,26 +83,22 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
       backgroundColor: 'white',
     },
     strings: {
-      no_available_times: 'No have available slots',
+      noAvailableItems: 'No available time slots',
     },
   }
 
-  state = {
-    showDate: undefined,
-    changeDayClicked: false,
-  }
-
-  componentDidMount() {
+  constructor(props: TimeCalendarProps) {
+    super(props)
     const { slots, selectedDate } = this.props
     let showDate = selectedDate
     if (!showDate) {
-      showDate = this.selectDefaultDay(slots)
+      showDate = Object.keys(slots)[0] // select first day by default
     }
 
-    this.setState({
+    this.state = {
       showDate: showDate,
       changeDayClicked: false,
-    })
+    }
   }
 
   componentDidUpdate(
@@ -146,10 +135,6 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
       showDate: nextDay,
       changeDayClicked: true,
     })
-  }
-
-  selectDefaultDay(slots: SlotMap): DayKey {
-    return Object.keys(slots)[0]
   }
 
   renderHeader(slots: SlotMap) {
@@ -220,7 +205,7 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     const { strings } = this.props
     return (
       <Text style={{ textAlign: 'center', marginTop: 16, marginHorizontal: 16 }}>
-        {strings!.no_available_times}
+        {strings!.noAvailableItems}
       </Text>
     )
   }
@@ -241,14 +226,14 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
     if (!slots) return this.renderEmpty()
 
     const daySlots: Slot[] = slots[showDate!]!!
-    const rows = chunk(daySlots, columns)
+    const rows = chunk(daySlots, columns!)
 
     return (
       <View style={[{ paddingBottom: 4 }, style]}>
         {this.renderHeader(slots)}
         {rows.map((column, indexColumn) => (
           <View
-            key={column.map(slot => keyExtractor(slot)).join(';')}
+            key={column.map(slot => keyExtractor!(slot)).join(';')}
             style={{
               width: '100%',
               flexDirection: 'row',
@@ -260,8 +245,8 @@ export class TimeCalendar extends Component<TimeCalendarProps, TimeCalendarState
               return renderSlot(
                 {
                   onPress: () => onSlotSelected(showDate!, slot),
-                  key: keyExtractor(slot),
-                  timeFormatter: timeFormatter,
+                  key: keyExtractor!(slot),
+                  timeFormatter: timeFormatter!,
                 },
                 slot
               )
