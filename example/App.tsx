@@ -154,7 +154,6 @@ export default class App extends Component<{}, AppState> {
               slots={slots}
               showDate={showDate}
               showTime={showTime}
-              formatDay={(day: DayKey) => day}
               formatTime={(slot: Slot) => `${slot.time.getHours()}:${slot.time.getMinutes()}`}
               onDateChanges={(date: DayKey | null, slot: Slot | null) => {
                 this.setState({

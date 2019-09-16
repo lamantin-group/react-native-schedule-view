@@ -286,7 +286,7 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
       return (
         <TimeCalendar
           slots={slots}
-          keyExtractor={slot => slot.time.toDateString()}
+          keyExtractor={slot => slot.time.toUTCString()}
           selectedDate={selectedDate}
           onSlotSelected={(day: DayKey, slot: Slot) => {
             this.setState({
