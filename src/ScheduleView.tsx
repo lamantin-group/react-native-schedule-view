@@ -17,6 +17,7 @@ export interface ScheduleViewProps {
   today?: Date
 
   renderDay?: (dayProps: DayProps) => React.ReactNode
+  renderTime?: (slotProps: SlotProps) => React.ReactNode
 
   mapSlotsToSingleDay?: (day: DayKey, slots: Slot[]) => MarkedDay
 
@@ -57,6 +58,12 @@ export type DayProps = {
   enabled: boolean
   selected: boolean
   today: boolean
+}
+
+export type SlotProps = {
+  selected: boolean
+  enabled: boolean
+  slot: Slot
 }
 
 export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState> {
@@ -132,6 +139,9 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
         </Circle>
       )
     },
+    renderTime: (slotProps: SlotProps) => {
+      return <Text>{slotProps.slot.time.toLocaleTimeString()}</Text>
+    },
   }
 
   constructor(props: ScheduleViewProps) {
@@ -196,7 +206,14 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
 
   renderBottomView() {
     const { showCalendar, showTime, selectedDate, selectedSlot, currentDateHack } = this.state
-    const { slots, isLoading, onMonthChanges, mapSlotsToSingleDay, renderDay } = this.props
+    const {
+      slots,
+      isLoading,
+      onMonthChanges,
+      mapSlotsToSingleDay,
+      renderDay,
+      renderTime,
+    } = this.props
     const markedDates: { [day: string]: MarkedDay } = { ...slots }
     if (showCalendar) {
       const today = new Date().toISOString().slice(0, 10) // yyyy-mm-dd
@@ -288,51 +305,22 @@ export class ScheduleView extends Component<ScheduleViewProps, ScheduleViewState
             })
           }}
           renderSlot={(props, slot) => {
-            // todo: fixme
-            // let textStyle = stylesTime.common
-            const textStyle = {}
-            const containerStyle: ViewStyle = {
-              borderRadius: 4,
-              paddingHorizontal: 8,
-              marginVertical: 4,
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }
             const selected = slot.time === (selectedSlot || {}).time
-            const disabled = false // todo: move it to props
-            // const { promoted } = slot
-
-            // todo: refactor this
-            // if (disabled) textStyle = stylesTime.disabled
-            // if (promoted) {
-            //   textStyle = stylesTime.promoted
-            //   containerStyle.borderWidth = 1
-            //   containerStyle.borderColor = colors.divider
-            // }
-            // if (selected) {
-            //   textStyle = stylesTime.selected
-            //   containerStyle.backgroundColor = colors.divider
-            // }
-
-            // todo: need refactor this place should be in another place, not in render
-            // this determinate state, where user select date and after fetch new slots, this slot was disabled
+            const disabled = !slot.enabled
             if (disabled && selected) {
               this.setState({
                 selectedSlot: null,
               })
             }
-
+            const slotProps: SlotProps = {
+              selected: selected,
+              enabled: !disabled,
+              slot: slot,
+            }
             return (
-              <StateView {...props} enabled={!disabled} style={containerStyle}>
-                <Text
-                  style={{
-                    ...textStyle,
-                    paddingVertical: 5,
-                  }}>
-                  {slot.time.toLocaleTimeString()}
-                </Text>
-              </StateView>
+              <ClickableView key={props.key} onPress={props.onPress} disabled={disabled}>
+                <StateView enabled={!disabled}>{renderTime!(slotProps)}</StateView>
+              </ClickableView>
             )
           }}
         />

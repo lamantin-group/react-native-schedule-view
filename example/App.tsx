@@ -10,7 +10,7 @@
 
 import React, { Fragment } from 'react'
 import { SafeAreaView, StyleSheet, ScrollView, View, Text, StatusBar } from 'react-native'
-
+import XDate from 'xdate'
 import {
   Header,
   LearnMoreLinks,
@@ -67,6 +67,11 @@ const App = () => {
     '2019-09-16': [
       {
         time: new Date(),
+        enabled: true,
+      },
+      {
+        time: new XDate(new Date()).addHours(1).toDate(),
+        enabled: false,
       },
     ],
   }
