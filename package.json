@@ -1,14 +1,20 @@
 {
-  "name": "react-native-library",
+  "name": "react-native-schedule-view",
   "version": "1.0.0",
   "author": "lamantin",
-  "description": "Library bootstrap",
+  "description": "Time table schedule for react-native",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/USERNAME/REPOSITORY.git"
+    "url": "git+https://github.com/lamantin-group/react-native-schedule-view.git"
   },
   "keywords": [
+    "react-native-schedule-view",
+    "schedule",
+    "time",
+    "table",
+    "time-table",
+    "view",
     "react-native"
   ],
   "main": "index.ts",
